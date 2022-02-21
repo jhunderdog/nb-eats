@@ -1,3 +1,4 @@
+import { RestaurantsModule } from './restaurants/restaurants.module';
 import { Verification } from './users/entities/verification.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 
@@ -57,6 +58,7 @@ import { Category } from './restaurants/entities/category.entity';
 privateKey: process.env.PRIVATE_KEY,
     }),
     UsersModule,
+    RestaurantsModule,
     
     AuthModule,
     
