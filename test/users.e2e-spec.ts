@@ -5,6 +5,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { getConnection, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { Verification } from 'src/users/entities/verification.entity';
 
 
 jest.mock("got", () => {
@@ -23,6 +24,7 @@ const testUser = {
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
   let usersRespotiry: Repository<User>
+  let verificationRespository: Repository<Verification>
   let jwtToken: string;
 
   beforeAll(async () => {
@@ -32,6 +34,7 @@ describe('UserModule (e2e)', () => {
 
     app = module.createNestApplication();
     usersRespotiry = module.get<Repository<User>>(getRepositoryToken(User))
+    verificationRespository= module.get<Repository<Verification>>(getRepositoryToken(Verification))
     await app.init();
   });
 
@@ -323,7 +326,68 @@ describe('UserModule (e2e)', () => {
       
     })
   });
-  it.todo('verifyEmail')
+  describe('verifyEmail', ()=> {
+    let verificationCode: string;
+    beforeAll(async ()=> {
+      const [verification] = await verificationRespository.find();
+      verificationCode = verification.code;
+      console.log(verification);      
+    });
+    it("should verify email", ()=> {
+      return request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query: `
+          mutation {
+            verifyEmail(input: {
+              code: "${verificationCode}"
+            }){
+              ok
+              error
+            }
+          }
+        `,
+
+      }).expect(200).expect(res => {
+        const { 
+          body: { 
+            data: {
+              verifyEmail: { ok, error },
+            },
+          },
+        } = res;
+        expect(ok).toBe(true)
+        expect(error).toBe(null);
+      })
+    })
+    it("should fail on wrong verification code not found", () => {
+      return request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query: `
+          mutation {
+            verifyEmail(input: {
+              code: "xxxxx"
+            }){
+              ok
+              error
+            }
+          }
+        `,
+
+      }).expect(200).expect(res => {
+        const { 
+          body: { 
+            data: {
+              verifyEmail: { ok, error },
+            },
+          },
+        } = res;
+        expect(ok).toBe(false)
+        expect(error).toBe("Verification not found.");
+      })
+    })
+  })
   
 
 });
