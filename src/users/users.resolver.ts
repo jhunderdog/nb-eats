@@ -10,6 +10,7 @@ import { UsersService } from "./users.service";
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import { Role } from 'src/auth/role.decorator';
 
 @Resolver(of => User)
 export class UsersResolver {
@@ -31,19 +32,21 @@ export class UsersResolver {
     }
 
     @Query(returns => User)
-    @UseGuards(AuthGuard)
+    @Role(["Any"])
     me(@AuthUser() lUser: User){
         return lUser;
     }
     
-    @UseGuards(AuthGuard)
+    
     @Query(returns => UserProfileOutput)
+    @Role(["Any"])
     userProfile(@Args() userProfileInput: UserProfileInput): Promise<UserProfileOutput> {
         return this.usersService.findById(userProfileInput.userId);    
     }
 
-    @UseGuards(AuthGuard)
+    
     @Mutation(returns => EditProfileOutput)
+    @Role(["Any"])
     editProfile(@AuthUser() lUser: User, @Args('input') editProfileInput: EditProfileInput): Promise<EditProfileOutput>{
         return this.usersService.editProfile(lUser.id, editProfileInput);
        
