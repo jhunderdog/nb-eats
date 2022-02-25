@@ -1,3 +1,4 @@
+import { CategoryRepository } from './repositories/category.repository';
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restaurant.dto';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto';
 import { Injectable } from "@nestjs/common";
@@ -13,11 +14,11 @@ export class RestaurantService {
     constructor(
         @InjectRepository(Restaurant) 
         private readonly restaurants: Repository<Restaurant>,
-        @InjectRepository(Category)
-        private readonly categories: Repository<Category>
+        
+        private readonly categories: CategoryRepository
         ){}
 
-   async getOrCreateCategory(name: string): Promise<Category>{
+   async getOrCreate(name: string): Promise<Category>{
     const categoryName = name.trim().toLowerCase();
     const categorySlug = categoryName.replace(/ /g, "-");            
     let category = await this.categories.findOne({slug: categorySlug});
@@ -37,9 +38,10 @@ export class RestaurantService {
         try {
             const newRestaurant = this.restaurants.create(createRestaurantInput);
             newRestaurant.owner = owner;
-            const category = await this.getOrCreateCategory(
+            const category = await this.categories.getOrCreate(
                 createRestaurantInput.categoryName,
-            )
+            );
+            
             newRestaurant.category = category;
             await this.restaurants.save(newRestaurant);
             return {
@@ -75,7 +77,18 @@ export class RestaurantService {
                     error: "You can't edit a restaurant that you don't own",
                 }
             }
-
+            let category : Category = null;
+            if(editRestaurantInput.categoryName) {
+                category = await this.categories.getOrCreate(
+                    editRestaurantInput.categoryName
+                    );
+            }
+            await this.restaurants.save([
+                {
+                id: editRestaurantInput.restaurantId,
+                ...editRestaurantInput,
+                ...(category && {category}),
+            }]);
             return {
                 ok: true,
             };
