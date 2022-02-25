@@ -1,3 +1,4 @@
+import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restaurant.dto';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto';
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -45,6 +46,11 @@ export class RestaurantService {
                 error: "Could not create restaurant",
             }
         }
+    }
+
+
+    async editRestaurant(owner: User, editRestaurantInput: EditRestaurantInput): Promise<EditRestaurantOutput>{
+        return {ok: true}
     }
 
 }

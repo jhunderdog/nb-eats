@@ -1,3 +1,4 @@
+import { EditRestaurantOutput, EditRestaurantInput } from './dtos/edit-restaurant.dto';
 import { Restaurant } from './entities/restaurant.entity';
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto';
@@ -22,4 +23,12 @@ export class RestaurantResolver {
         );
     }
 
+    @Mutation(returns => EditRestaurantOutput)
+    @Role(["Owner"])
+    editRestaurant(
+        @AuthUser() authUser: User,
+        @Args('input')  editRestaurant: EditRestaurantInput
+    ) : EditRestaurantOutput {
+        return { ok: true };
+    }
 }
