@@ -1,3 +1,4 @@
+import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dtos/delete-restaurant.dto';
 import { EditRestaurantOutput, EditRestaurantInput } from './dtos/edit-restaurant.dto';
@@ -46,6 +47,12 @@ export class RestaurantResolver {
             owner, 
             deleteRestaurantInput
             );
+    }
+
+    @Query(returns => RestaurantsOutput)
+    restaurants(@Args('input') restaurantInput: RestaurantsInput
+    ): Promise<RestaurantsOutput> {
+        return this.restaurantService.allRestaurants(restaurantInput);
     }
 }
 
