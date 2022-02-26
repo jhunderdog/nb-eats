@@ -10,6 +10,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Category } from './entities/category.entity';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
+import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -144,6 +145,29 @@ export class RestaurantService {
 
     countRestaurants(category: Category){
         return this.restaurants.count({ category })
+    }
+
+    async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+        try {
+            const category = await this.categories.findOne(
+                {slug}, 
+                {relations: ['restaurants']}
+                );
+            if(!category) {
+                return {
+                    ok: false,
+                    error: "Cateogry not found"
+                }
+            }
+            return {
+                ok: true,
+                category,
+            }
+        } catch {
+            return {
+                ok: false
+            }
+        }
     }
 
 }

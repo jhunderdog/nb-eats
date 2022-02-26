@@ -10,6 +10,7 @@ import { User, UserRole } from 'src/users/entities/user.entity';
 import { SetMetadata } from '@nestjs/common';
 import { Role } from 'src/auth/role.decorator';
 import { Category } from './entities/category.entity';
+import { CategoryInput, CategoryOutput } from './dtos/category.dto';
 
 @Resolver(of => Restaurant)
 export class RestaurantResolver {
@@ -59,5 +60,9 @@ export class CategoryResolver {
     @Query(type => AllCategoriesOutput)
     allCategories(): Promise<AllCategoriesOutput>{
         return this.restaurantService.allCategories();
+    }
+    @Query(type => CategoryOutput)
+    category(@Args() categoryInput: CategoryInput): Promise<CategoryOutput> {
+        return this.restaurantService.findCategoryBySlug(categoryInput);
     }
 }
