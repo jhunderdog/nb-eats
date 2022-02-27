@@ -1,3 +1,4 @@
+import { OrderItem } from './orders/entities/order-item.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { Verification } from './users/entities/verification.entity';
 import { JwtMiddleware } from './jwt/jwt.middleware';
@@ -55,7 +56,7 @@ import { Order } from './orders/entities/order.entity';
       database:process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== "prod",
       logging: process.env.NODE_ENV !== "prod" && process.env.NODE_ENV !== 'test',
-      entities: [User, Verification, Restaurant, Category, Dish, Order]
+      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem]
     }),
     JwtModule.forRoot({
 privateKey: process.env.PRIVATE_KEY,
