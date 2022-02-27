@@ -6,7 +6,7 @@ import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restauran
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto';
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository } from "typeorm";
+import { Like, Raw, Repository } from "typeorm";
 import { Restaurant } from "./entities/restaurant.entity";
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/users/entities/user.entity';
@@ -230,9 +230,17 @@ export class RestaurantService {
         try {
             const [restaurants, totalResults] = await this.restaurants.findAndCount({
                 where: {
-                    name: Like(`%${query}%`)
-                }
-            })
+                    name: Raw(name => `${name} ILIKE '%${query}%'`)
+                },
+                skip: (page - 1) * 25,
+                take: 25,
+            });
+            return {
+                ok: true,
+                restaurants,
+                totalResults,
+                totalPages: Math.ceil(totalResults / 25),
+            }
         } catch {
             return {
                 ok: false,
