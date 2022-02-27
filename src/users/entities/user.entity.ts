@@ -7,6 +7,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { InternalServerErrorException } from '@nestjs/common';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { Order } from 'src/orders/entities/order.entity';
 
 // type UserRole = "client" | "owner" | "delivery"
 export enum UserRole {
@@ -51,6 +52,21 @@ export class User extends CoreEntity {
         restaurant => restaurant.owner,
     )
     restaurants: Restaurant[];
+
+    @Field(type => [Order])
+    @OneToMany(
+        type => Order,
+        order => order.customer,
+    )
+    orders: Order[];
+
+    @Field(type => [Order])
+    @OneToMany(
+        type => Order,
+        order => order.driver,
+    )
+    rides: Order[];
+
 
     @BeforeInsert()
     @BeforeUpdate()
