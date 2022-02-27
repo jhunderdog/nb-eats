@@ -1,3 +1,4 @@
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import { SearchRestaurantInput, SearchRestaurantOutput } from './dtos/search-restaurant.dto';
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/delete-restaurant.dto';
@@ -207,7 +208,7 @@ export class RestaurantService {
 
     async findRestaurantById({restaurantId}: RestaurantInput): Promise<RestaurantOutput> {
         try {
-            const restaurant = await this.restaurants.findOne(restaurantId);
+            const restaurant = await this.restaurants.findOne(restaurantId, {relations: ['menu'],});
             if(!restaurant) {
                 return {
                     ok: false,
@@ -248,4 +249,13 @@ export class RestaurantService {
             }
         }
     }
+
+    async createDish(
+        owner: User, 
+        createDishInput: CreateDishInput
+        ): Promise<CreateDishOutput>{
+            return {
+                ok: false,
+            }
+        }
 }
