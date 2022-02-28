@@ -8,8 +8,8 @@ import { Dish, DishChoice, DishOption } from 'src/restaurants/entities/dish.enti
 export class OrderItemOption {
     @Field(type => String)
     name: string;
-    @Field(type => [DishChoice], {nullable: true})
-    choice?: DishChoice[];
+    @Field(type => String, {nullable: true})
+    choice?: String;
     @Field(type => Int, {nullable: true})
     extra?: number;
 }
