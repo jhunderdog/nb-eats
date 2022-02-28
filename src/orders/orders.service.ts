@@ -16,7 +16,7 @@ export class OrderService {
         @InjectRepository(OrderItem)
         private readonly orderItems: Repository<OrderItem>,
         @InjectRepository(Restaurant)
-        private readonly restaurants: Repository<Restaurant>
+        private readonly restaurants: Repository<Restaurant>,
         @InjectRepository(Dish)
         private readonly dishes: Repository<Dish>
         ){
@@ -32,28 +32,43 @@ export class OrderService {
                     error: "Restaurant not found"
                 };
             }
-            items.forEach(async item => {
+            for (const item of items) {
                 const dish = await this.dishes.findOne(item.dishId);
                 if(!dish){
-                    // abort this whole thing
+                    return {
+                        ok: false,
+                        error: "Dish not found."
+                    }
                 }
-                await this.orderItems.save(this.orderItems.create({
-                    dish,
-                    options: item.options,
+                console.log(`Dish price: ${dish.price}`);
+                for(const itemOption of item.options){
+                    // console.log(itemOption);
+                    const dishOption = dish.options.find(
+                        dishOption => dishOption.name === itemOption.name
+                    );
+                    if(dishOption){
+                        if(dishOption.extra){
+                            console.log(`$USD +${dishOption.extra}`)
+                        } else {
+                            const dishOptionChoice = dishOption.choices.find(optionChoice => optionChoice.name === itemOption.choice);
+                            // console.log(dishOptionChoice);
+                            if(dishOptionChoice) {
+                                console.log(`$USD +${dishOptionChoice.extra}`)
+                            }
+                        }
+
+                    }
+                    // console.log(itemOption.name, dishOption.name);
+                    // console.log(dishOption);
                 }
-                ))
-            })
-            // items.forEach(item =>
-            //     console.log(item.options));
-            // const order = await this.orders.save(this.orders.create({
-            //     customer,
-            //     restaurant,
-            // })
+                // item.options
+                // dish.options
+                // await this.orderItems.save(this.orderItems.create({
+                //     dish,
+                //     options: item.options,
+                // }),
+                // )
+            }
             
-            // );
-            // console.log(order);
-            // return {
-            //     ok: true,
-            // }
         }
 }

@@ -10,8 +10,6 @@ export class OrderItemOption {
     name: string;
     @Field(type => String, {nullable: true})
     choice?: String;
-    @Field(type => Int, {nullable: true})
-    extra?: number;
 }
 
 
