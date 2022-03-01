@@ -10,6 +10,7 @@ import { Dish } from 'src/restaurants/entities/dish.entity';
 export enum OrderStatus {
     Pending = 'Pending',
     Cooking = 'Cooking',
+    Cooked = 'Cooked',
     PickedUp = 'PickedUp',
     Delivered = 'Delivered',
 }
