@@ -23,8 +23,11 @@ export class OrderService {
 
 
         }       
-        async createOrder(customer:User, { restaurantId, items }: CreateOrderInput)
-         : Promise<CreateOrderOutput> {
+        async createOrder(
+            customer:User, 
+            { restaurantId, items }: CreateOrderInput
+    )   : Promise<CreateOrderOutput> {
+           try {
             const restaurant = await this.restaurants.findOne(restaurantId);
             if(!restaurant) {
                 return {
@@ -32,6 +35,8 @@ export class OrderService {
                     error: "Restaurant not found"
                 };
             }
+            let orderFinalPrice = 0;
+            const orderItems: OrderItem[] = [];
             for (const item of items) {
                 const dish = await this.dishes.findOne(item.dishId);
                 if(!dish){
@@ -40,35 +45,52 @@ export class OrderService {
                         error: "Dish not found."
                     }
                 }
-                console.log(`Dish price: ${dish.price}`);
-                for(const itemOption of item.options){
-                    // console.log(itemOption);
+                let dishFinalPrice = dish.price;                
+                for(const itemOption of item.options){                    
                     const dishOption = dish.options.find(
                         dishOption => dishOption.name === itemOption.name
                     );
                     if(dishOption){
                         if(dishOption.extra){
-                            console.log(`$USD +${dishOption.extra}`)
+                            dishFinalPrice = dishFinalPrice + dishOption.extra;
                         } else {
-                            const dishOptionChoice = dishOption.choices.find(optionChoice => optionChoice.name === itemOption.choice);
-                            // console.log(dishOptionChoice);
+                            const dishOptionChoice = dishOption.choices.find(
+                                optionChoice => optionChoice.name === itemOption.choice,
+                            );                        
                             if(dishOptionChoice) {
-                                console.log(`$USD +${dishOptionChoice.extra}`)
+                                if (dishOptionChoice.extra){
+                                    dishFinalPrice = dishFinalPrice + dishOptionChoice.extra;
+                                }
                             }
                         }
-
-                    }
-                    // console.log(itemOption.name, dishOption.name);
-                    // console.log(dishOption);
+                    }                    
                 }
-                // item.options
-                // dish.options
-                // await this.orderItems.save(this.orderItems.create({
-                //     dish,
-                //     options: item.options,
-                // }),
-                // )
+                orderFinalPrice = orderFinalPrice + dishFinalPrice;
+                const orderItem = await this.orderItems.save(
+                    this.orderItems.create({
+                    dish,
+                    options: item.options,
+                }),
+                );
+                orderItems.push(orderItem);
+            }            
+            await this.orders.save(
+                this.orders.create({
+                    customer,
+                    restaurant,
+                    total: orderFinalPrice,
+                    items: orderItems,
+                }),                
+            );
+            return {
+                ok: true,
             }
-            
+           } catch {
+               return {
+                   ok: false,
+                   error: "Could not create order."
+               }
+           }
+         
         }
 }
