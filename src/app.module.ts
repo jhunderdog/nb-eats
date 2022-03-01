@@ -44,6 +44,7 @@ import { Order } from './orders/entities/order.entity';
       })
     }),
     GraphQLModule.forRoot({
+      installSubscriptionHandlers: true,
       autoSchemaFile: true,
       context: ({req}) => ({user: req['user']})
     }),

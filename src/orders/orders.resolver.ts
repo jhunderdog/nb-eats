@@ -3,11 +3,16 @@ import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersOutput, GetOrdersInput } from './dtos/get-orders.dto';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { OrderService } from './orders.service';
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver, Subscription } from "@nestjs/graphql";
 import { Order } from "./entities/order.entity";
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/auth/role.decorator';
+import { PubSub } from 'graphql-subscriptions';
+
+
+
+const pubsub = new PubSub();
 
 @Resolver(of => Order)
 export class OrderResolver {
@@ -50,4 +55,8 @@ export class OrderResolver {
             return this.ordersService.editOrder(user, editOrderInput);
         }
         
+        @Subscription(returns => String)
+        hotPotatos(){
+            return pubsub.asyncIterator("hotPotatos");
+        }
 }
