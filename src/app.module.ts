@@ -46,7 +46,13 @@ import { Order } from './orders/entities/order.entity';
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
-      context: ({req}) => ({user: req['user']})
+      context: ({req, connection}) => {
+        if(req){
+          return {user: req['user']}
+        } else {
+          console.log(connection);  
+        }        
+      }
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
