@@ -47,12 +47,15 @@ import { Order } from './orders/entities/order.entity';
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
       context: ({req, connection}) => {
-        if(req){
-          return {user: req['user']}
-        } else {
-          console.log(connection);  
+        const TOKEN_KEY = 'x-jwt'
+        
+          return { 
+            token: req ? req.headers[TOKEN_KEY] : connection.context[TOKEN_KEY]
+          }
+        
+          
         }        
-      }
+
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -86,10 +89,4 @@ privateKey: process.env.PRIVATE_KEY,
   controllers: [],
   providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-      consumer.apply(JwtMiddleware).forRoutes(
-        {path: "/graphql", method: RequestMethod.ALL}
-      );
-  }
-}
+export class AppModule {}
