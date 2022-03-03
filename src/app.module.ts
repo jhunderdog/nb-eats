@@ -1,3 +1,4 @@
+import { CommonModule } from './common/common.module';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { Verification } from './users/entities/verification.entity';
@@ -83,6 +84,7 @@ privateKey: process.env.PRIVATE_KEY,
     }),
     AuthModule,
     OrdersModule,
+    CommonModule,
     
 
   ],
