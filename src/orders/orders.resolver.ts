@@ -1,3 +1,4 @@
+import { TakeOrderOutput, TakeOrderInput } from './dtos/take-order.dto';
 import { OrderUpdatesInput } from './dtos/order-updates.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { NEW_COOKED_ORDER, NEW_ORDER_UPDATE, NEW_PENDING_ORDER, PUB_SUB } from './../common/common.constants';
@@ -98,5 +99,14 @@ export class OrderResolver {
         @Role(["Any"])
         orderUpdates(@Args('input') orderUpdatesInput : OrderUpdatesInput){
             return this.pubSub.asyncIterator(NEW_ORDER_UPDATE);
+        }
+
+        @Mutation(returns => TakeOrderOutput)
+        @Role(["Delivery"])
+        takeOrder(
+            @AuthUser() driver: User, 
+            @Args("input") takeOrderInput: TakeOrderInput,
+        ): Promise<TakeOrderOutput> {
+            return this.ordersService.takeOrder(driver, takeOrderInput);
         }
 }
