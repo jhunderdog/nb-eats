@@ -1,5 +1,5 @@
 import { PubSub } from 'graphql-subscriptions';
-import { PUB_SUB } from './../common/common.constants';
+import { NEW_PENDING_ORDER, PUB_SUB } from './../common/common.constants';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { GetOrdersOutput, GetOrdersInput } from './dtos/get-orders.dto';
@@ -60,24 +60,14 @@ export class OrderResolver {
             return this.ordersService.editOrder(user, editOrderInput);
         }
 
-        @Mutation(returns => Boolean)
-        async potatoReady(@Args('potatoId') potatoId: number){
-            await this.pubSub.publish('hotPotatos', {
-                readyPotato: potatoId,
-            });
+        @Subscription(returns => Order, {
+            filter: (payload, _, context) => {
+            console.log(payload, context);
             return true;
-        }
-        
-        @Subscription(returns => String, {
-            filter: ({readyPotato}, {potatoId},) => {
-                
-                return readyPotato === potatoId;
             },
-            resolve: ({readyPotato}) => 
-            `Your potato with the id ${readyPotato} is ready!`,
         })
-        @Role(['Any'])
-        readyPotato(@Args('potatoId') potatoId: number){        
-            return this.pubSub.asyncIterator("hotPotatos");
+        @Role(['Owner'])
+        pendingOrders(){
+            return this.pubSub.asyncIterator(NEW_PENDING_ORDER);
         }
 }
