@@ -1,4 +1,4 @@
-import { PUB_SUB, NEW_PENDING_ORDER, NEW_COOKED_ORDER } from './../common/common.constants';
+import { PUB_SUB, NEW_PENDING_ORDER, NEW_COOKED_ORDER, NEW_ORDER_UPDATE } from './../common/common.constants';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto';
 import { Restaurant } from './../restaurants/entities/restaurant.entity';
@@ -189,7 +189,7 @@ export class OrderService {
         {id:orderId, status}: EditOrderInput
     ) : Promise<EditOrderOutput>{
         try {
-            const order = await this.orders.findOne(orderId, {relations: ['restaurant']});
+            const order = await this.orders.findOne(orderId);
         if(!order){
             return {
                 ok: false,
@@ -226,11 +226,16 @@ export class OrderService {
             id:orderId,
             status
         });
+        const newOrder = {...order, status }
         if (user.role === UserRole.Owner){
             if(status === OrderStatus.Cooked){
-                await this.pubSub.publish(NEW_COOKED_ORDER, {cookedOrders: {...order, status }})
+                await this.pubSub.publish(
+                    NEW_COOKED_ORDER, {
+                        cookedOrders: newOrder,
+                    })
             }
         }
+        await this.pubSub.publish(NEW_ORDER_UPDATE, { orderUpdates : newOrder});
         return {
             ok: true,
         }
