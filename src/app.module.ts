@@ -2,7 +2,7 @@ import { CommonModule } from './common/common.module';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { Verification } from './users/entities/verification.entity';
-import { JwtMiddleware } from './jwt/jwt.middleware';
+
 
 
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
@@ -23,6 +23,8 @@ import { Category } from './restaurants/entities/category.entity';
 import { Dish } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -67,7 +69,7 @@ import { Order } from './orders/entities/order.entity';
       database:process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== "prod",
       logging: process.env.NODE_ENV !== "prod" && process.env.NODE_ENV !== 'test',
-      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem]
+      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem, Payment]
     }),
     JwtModule.forRoot({
 privateKey: process.env.PRIVATE_KEY,
@@ -85,6 +87,7 @@ privateKey: process.env.PRIVATE_KEY,
     AuthModule,
     OrdersModule,
     CommonModule,
+    PaymentsModule,
     
 
   ],

@@ -1,3 +1,4 @@
+import { Payment } from './../../payments/entities/payment.entity';
 import { Restaurant } from './../../restaurants/entities/restaurant.entity';
 import { IsBoolean } from 'class-validator';
 import { Field, InputType, registerEnumType } from '@nestjs/graphql';
@@ -59,6 +60,13 @@ export class User extends CoreEntity {
         order => order.customer,
     )
     orders: Order[];
+
+    @Field(type => [Payment])
+    @OneToMany(
+        type => Payment,
+        payment => payment.user,
+    )
+    payments: Payment[];
 
     @Field(type => [Order])
     @OneToMany(
