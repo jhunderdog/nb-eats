@@ -5,6 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/users/entities/user.entity";
 import { Repository } from "typeorm/repository/Repository";
 import { Payment } from "./entities/payment.entity";
+import { GetPaymentsOutput } from './dtos/get-payments.dto';
 
 @Injectable()
 export class PaymentService {
@@ -49,4 +50,18 @@ export class PaymentService {
             }
          }
     } 
+    async getPayments(user:User): Promise<GetPaymentsOutput> {
+        try {
+            const payments = await this.payments.find({user: user});
+        return {
+            ok: true,
+            payments,
+        }
+        } catch {
+            return {
+                ok: false,
+                error: "Could not load payments.",
+            }
+        }
+    }
 }
