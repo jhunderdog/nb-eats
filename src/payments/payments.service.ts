@@ -7,6 +7,7 @@ import { Repository } from "typeorm/repository/Repository";
 import { Payment } from "./entities/payment.entity";
 import { GetPaymentsOutput } from './dtos/get-payments.dto';
 import { Cron, Interval, SchedulerRegistry, Timeout } from '@nestjs/schedule';
+import { LessThan } from 'typeorm';
 
 @Injectable()
 export class PaymentService {
@@ -71,6 +72,21 @@ export class PaymentService {
                 error: "Could not load payments.",
             }
         }
+    }
+
+    @Interval(2000)
+    async checkPromotedRestaurants(){
+        const restaurants = await this.restaurants.find({
+            isPromoted: true, 
+            promotedUntil: LessThan(new Date)
+        });
+        console.log(restaurants);
+        restaurants.forEach(async restaurant => {
+            restaurant.isPromoted = false
+            restaurant.promotedUntil = null
+            await this.restaurants.save(restaurant);
+        })
+    
     }
 
     // @Cron("30 * * * * *", {
