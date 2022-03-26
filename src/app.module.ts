@@ -26,6 +26,7 @@ import { Order } from './orders/entities/order.entity';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ privateKey: process.env.PRIVATE_KEY,
     OrdersModule,
     CommonModule,
     PaymentsModule,
+    UploadsModule,
     
 
   ],
