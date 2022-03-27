@@ -25,7 +25,7 @@ export class UploadsController {
         .putObject({
             Body: file.buffer,
             Bucket: BUCKET_NAME,
-            Key: `${Date.now() + file.originalname}`,
+            Key: objectName,
             ACL: 'public-read',
         })
         .promise();
@@ -33,6 +33,7 @@ export class UploadsController {
         return {url};
         
     } catch(e) {
+        console.log(e);
         return null;
     }    
     }
